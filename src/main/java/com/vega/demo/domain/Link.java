@@ -2,20 +2,28 @@ package com.vega.demo.domain;
 
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import lombok.NonNull;
 
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
+import javax.persistence.OneToMany;
+import java.util.ArrayList;
+import java.util.List;
 
 @NoArgsConstructor
 @Data
-public class Link {
+public class Link extends Auditable {
     @Id
     @GeneratedValue
 
     private Long id;
+    @NonNull
     private String title;
+    @NonNull
     private String url;
 
+    @OneToMany(mappedBy = "Link")
+    private List<Comment> comments = new ArrayList<>();
 /*
     public Long getId() {
         return id;
