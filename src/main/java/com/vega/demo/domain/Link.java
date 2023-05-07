@@ -1,14 +1,11 @@
 package com.vega.demo.domain;
 
-import com.vega.demo.repository.CommentRepository;
-import lombok.Data;
-import lombok.NoArgsConstructor;
-import lombok.NonNull;
-import lombok.RequiredArgsConstructor;
+import lombok.*;
 
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
+import javax.persistence.OneToMany;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
@@ -27,26 +24,29 @@ public class Link extends Auditable {
     @NonNull
     private String url;
 
-/*
-    @OneToMany(mappedBy = "Link")
-    private List<Comment> comments = new ArrayList<>();
 
-    private void addComment(Comment comment) {
+    @OneToMany(mappedBy = "link")
+    private List<Comment> comments = new ArrayList<>();
+    public void addComment(Comment comment) {
         comments.add(comment);
     }
 
- */
+    public List<String> getComments(){
+        List<String> randomComments = new ArrayList<>();
+        randomComments.add("This is funny");
+        randomComments.add("This is awesome");
+        randomComments.add("This is random");
+        randomComments.add("Dont visit this ever");
+        randomComments.add("This is super site");
+        return randomComments;
+    }
+    public String getPrettyTime(){
+        return this.getCreationDate().toString();
+    }
     public String getDomainName() throws URISyntaxException {
         URI uri = new URI(this.url);
         String domain = uri.getHost();
         return domain.startsWith("www.") ? domain.substring(4) : domain;
     }
 
-    //this implementation needs to be corrected
-    public List<String> getComments() {
-        List<String> comments = new ArrayList<>();
-        comments.add("Comment 1");
-        comments.add("Comment 2");
-        return comments;
-    }
 }

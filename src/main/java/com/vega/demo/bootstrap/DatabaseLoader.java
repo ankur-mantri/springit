@@ -1,28 +1,48 @@
 package com.vega.demo.bootstrap;
 
+import com.vega.demo.domain.Comment;
 import com.vega.demo.domain.Link;
+import com.vega.demo.domain.Role;
+import com.vega.demo.domain.UserSpringIt;
 import com.vega.demo.repository.CommentRepository;
 import com.vega.demo.repository.LinkRepository;
+import com.vega.demo.repository.RoleRepository;
+import com.vega.demo.repository.UserRepository;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.context.annotation.Profile;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Component;
 
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 
 @Profile("dev")
 @Component
 public class DatabaseLoader implements CommandLineRunner {
     private LinkRepository linkRepository;
     private CommentRepository commentRepository;
+    private RoleRepository roleRepository;
+    private UserRepository userRepository;
 
-    public DatabaseLoader(LinkRepository linkRepository, CommentRepository commentRepository) {
+    public DatabaseLoader(LinkRepository linkRepository, CommentRepository commentRepository, UserRepository userRepository,
+                          RoleRepository roleRepository) {
         this.linkRepository = linkRepository;
         this.commentRepository = commentRepository;
+        this.userRepository = userRepository;
+        this.roleRepository = roleRepository;
     }
 
     @Override
     public void run(String... args) throws Exception{
+
+        addUsersAndRoles();
+
+        List<String> randomComments = new ArrayList<>();
+        randomComments.add("This is funny");
+        randomComments.add("This is awesome");
+        randomComments.add("This is random");
+        randomComments.add("Dont visit this ever");
+        randomComments.add("This is super site");
+
 
         Map<String,String> links = new HashMap<>();
         links.put("Securing Spring Boot APIs and SPAs with OAuth 2.0","https://auth0.com/blog/securing-spring-boot-apis-and-spas-with-oauth2/?utm_source=reddit&utm_medium=sc&utm_campaign=springboot_spa_securing");
@@ -40,12 +60,41 @@ public class DatabaseLoader implements CommandLineRunner {
         links.forEach((k,v) -> {
             Link link = new Link(k,v);
             linkRepository.save(link);
+            int n = (int) (Math.random()*randomComments.size());
+            for (int i = 0; i < n; i++) {
+                Comment comment = new Comment(randomComments.get(i), link);
+                commentRepository.save(comment);
+                link.addComment(comment);
+            }
 
-            // we will do something with comments later
         });
 
         long linkCount = linkRepository.count();
         System.out.println("Number of links in the database: " + linkCount );
     }
+
+    private void addUsersAndRoles() {
+        BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
+        String secret = "{bcrypt}" + encoder.encode("password");
+
+        Role userRole = new Role("ROLE_USER");
+        roleRepository.save(userRole);
+        Role adminRole = new Role("ROLE_ADMIN");
+        roleRepository.save(adminRole);
+
+        UserSpringIt userSpringIt = new UserSpringIt("user@gmail.com",secret,true);
+        userSpringIt.addRole(userRole);
+        userRepository.save(userSpringIt);
+
+        UserSpringIt admin = new UserSpringIt("admin@gmail.com",secret,true);
+        admin.addRole(adminRole);
+        userRepository.save(admin);
+
+        UserSpringIt master = new UserSpringIt("master@gmail.com",secret,true);
+        master.addRoles(new HashSet<>(Arrays.asList(userRole,adminRole)));
+        userRepository.save(master);
+
+    }
+
 
 }

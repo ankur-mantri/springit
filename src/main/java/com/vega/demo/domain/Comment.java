@@ -1,14 +1,10 @@
 package com.vega.demo.domain;
 
 import lombok.Data;
-import lombok.NoArgsConstructor;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.Id;
-import javax.persistence.ManyToOne;
+import javax.persistence.*;
 
 
 @RequiredArgsConstructor
@@ -24,5 +20,4 @@ public class Comment extends Auditable {
     @NonNull
     @ManyToOne
     private Link link;
-
 }

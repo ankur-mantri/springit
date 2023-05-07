@@ -24,14 +24,14 @@
             </div>
             <div class="col-11">
                 <p class="title">
-                    <a class="title " th:href="@{'/link/' + ${link.id}}" th:text="${link.title}">
+                    <a class="title " th:href="@{'/link/' + ${link.id}}" th:text="${link.getTitle()}">
                         Title goes here
                     </a>
                     <span class="domain">(<a th:href="${link.url}" th:text="${link.getDomainName()}" target="_blank"> thereal.com</a>)</span>
                 </p>
                 <p class="tagline ">submitted
                     <time th:title="${link.getCreationDate()}" th:datetime="${link.getCreationDate()}" class="live-timestamp">2 hours ago</time> by
-                    <a href="profile.html" class="author">therealdanvega</a>
+                    <a href="/" class="author" th:text="${link.createdBy}">therealaam</a>
                 </p>
                 <p>
                     <a th:href="@{'/link/' + ${link.id} + '#comments'}" class="comments" th:text="|${link.getComments().size()} comments|"><i class="fas fa-comments"></i> 4 comments</a>
