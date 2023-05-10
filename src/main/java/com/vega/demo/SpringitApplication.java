@@ -1,5 +1,6 @@
 package com.vega.demo;
 
+import org.ocpsoft.prettytime.PrettyTime;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.boot.SpringApplication;
@@ -22,6 +23,11 @@ public class SpringitApplication {
 	@Bean
 	public SpringSecurityDialect securityDialect() {
 		return new SpringSecurityDialect();
+	}
+
+	@Bean
+	PrettyTime prettyTime() {
+		return new PrettyTime();
 	}
 
 }

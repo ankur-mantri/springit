@@ -1,10 +1,13 @@
 package com.vega.demo.controller;
 
+import com.vega.demo.domain.Comment;
 import com.vega.demo.domain.Link;
+import com.vega.demo.repository.CommentRepository;
 import com.vega.demo.repository.LinkRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.access.annotation.Secured;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
@@ -19,10 +22,13 @@ public class LinkController {
     private static final Logger logger = LoggerFactory.getLogger(LinkController.class);
 
     private LinkRepository linkRepository;
+    private CommentRepository commentRepository;
     @Autowired
-    public LinkController(LinkRepository linkRepository) {
+    public LinkController(LinkRepository linkRepository, CommentRepository commentRepository) {
         this.linkRepository = linkRepository;
+        this.commentRepository = commentRepository;
     }
+
 
     @GetMapping("/")
     public String list(Model model) {
@@ -34,7 +40,11 @@ public class LinkController {
     public String read(@PathVariable Long id, Model model) {
         Optional<Link> link = linkRepository.findById(id);
         if (link.isPresent()) {
-            model.addAttribute("link", link.get());
+            Link currentLink = link.get();
+            Comment comment = new Comment();
+            comment.setLink(currentLink);
+            model.addAttribute("comment", comment);
+            model.addAttribute("link", currentLink);
             model.addAttribute("success",model.containsAttribute("success"));
             return "link/view";
         } else {
@@ -48,6 +58,7 @@ public class LinkController {
         return "link/submit";
     }
 
+    @Secured({"ROLE_USER"})
     @PostMapping("/link/submit")
     public String createLink(Link link, BindingResult bindingResult, Model model, RedirectAttributes redirectAttributes) {
         if( bindingResult.hasErrors() ) {
@@ -64,5 +75,17 @@ public class LinkController {
             return "redirect:/link/{id}";
         }
     }
+    @Secured({"ROLE_USER"})
+    @PostMapping("/link/comments")
+    public String createComment(Comment comment, BindingResult bindingResult) {
+        if (bindingResult.hasErrors()) {
+            logger.info("Unable to Add comments");
 
+        } else  {
+            commentRepository.save(comment);
+            logger.info("Comment Saved");
+
+        }
+        return "redirect:/link/" + comment.getLink().getId();
+    }
 }

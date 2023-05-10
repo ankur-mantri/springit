@@ -1,20 +1,21 @@
 package com.vega.demo.domain;
 
+import com.vega.demo.service.BeanUtil;
 import lombok.*;
+import org.ocpsoft.prettytime.PrettyTime;
 
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.Id;
-import javax.persistence.OneToMany;
+import javax.persistence.*;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 @RequiredArgsConstructor
 @NoArgsConstructor
-@Data
-@Entity
+@Entity @Getter @Setter
 public class Link extends Auditable {
     @Id
     @GeneratedValue
@@ -34,17 +35,13 @@ public class Link extends Auditable {
         comments.add(comment);
     }
 
-    public List<String> getComments(){
-        List<String> randomComments = new ArrayList<>();
-        randomComments.add("This is funny");
-        randomComments.add("This is awesome");
-        randomComments.add("This is random");
-        randomComments.add("Dont visit this ever");
-        randomComments.add("This is super site");
-        return randomComments;
+    public String getPrettyTime() {
+        PrettyTime pt = BeanUtil.getBean(PrettyTime.class);
+        return pt.format(convertToDateviaInstant(getCreationDate()));
     }
-    public String getPrettyTime(){
-        return this.getCreationDate().toString();
+
+    private Date convertToDateviaInstant(LocalDateTime dateToConvert) {
+        return java.util.Date.from(dateToConvert.atZone(ZoneId.systemDefault()).toInstant());
     }
     public String getDomainName() throws URISyntaxException {
         URI uri = new URI(this.url);

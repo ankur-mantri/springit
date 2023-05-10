@@ -62,15 +62,17 @@ public class DatabaseLoader implements CommandLineRunner {
             linkRepository.save(link);
             int n = (int) (Math.random()*randomComments.size());
             for (int i = 0; i < n; i++) {
-                Comment comment = new Comment(randomComments.get(i), link);
+               Comment comment = new Comment(randomComments.get(i), link);
                 commentRepository.save(comment);
                 link.addComment(comment);
             }
+
 
         });
 
         long linkCount = linkRepository.count();
         System.out.println("Number of links in the database: " + linkCount );
+
     }
 
     private void addUsersAndRoles() {
