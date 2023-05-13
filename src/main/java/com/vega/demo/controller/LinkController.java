@@ -2,8 +2,8 @@ package com.vega.demo.controller;
 
 import com.vega.demo.domain.Comment;
 import com.vega.demo.domain.Link;
-import com.vega.demo.repository.CommentRepository;
-import com.vega.demo.repository.LinkRepository;
+import com.vega.demo.service.CommentService;
+import com.vega.demo.service.LinkService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,24 +21,24 @@ public class LinkController {
 
     private static final Logger logger = LoggerFactory.getLogger(LinkController.class);
 
-    private LinkRepository linkRepository;
-    private CommentRepository commentRepository;
+    private LinkService linkService;
+    private CommentService commentService;
     @Autowired
-    public LinkController(LinkRepository linkRepository, CommentRepository commentRepository) {
-        this.linkRepository = linkRepository;
-        this.commentRepository = commentRepository;
+    public LinkController(LinkService linkService, CommentService commentService) {
+        this.linkService = linkService;
+        this.commentService = commentService;
     }
 
 
     @GetMapping("/")
     public String list(Model model) {
-        model.addAttribute("links", linkRepository.findAll());
+        model.addAttribute("links", linkService.findAll());
         model.addAttribute("pageTitle", "List of Links");
         return "link/list";
     }
     @GetMapping("link/{id}")
     public String read(@PathVariable Long id, Model model) {
-        Optional<Link> link = linkRepository.findById(id);
+        Optional<Link> link = linkService.findById(id);
         if (link.isPresent()) {
             Link currentLink = link.get();
             Comment comment = new Comment();
@@ -67,7 +67,7 @@ public class LinkController {
             return "link/submit";
         } else {
             // save our link
-            linkRepository.save(link);
+            linkService.save(link);
             logger.info("New link was saved successfully");
             redirectAttributes
                     .addAttribute("id",link.getId())
@@ -82,7 +82,7 @@ public class LinkController {
             logger.info("Unable to Add comments");
 
         } else  {
-            commentRepository.save(comment);
+            commentService.save(comment);
             logger.info("Comment Saved");
 
         }
