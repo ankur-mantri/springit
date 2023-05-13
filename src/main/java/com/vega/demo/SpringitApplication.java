@@ -7,6 +7,7 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
 import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
 import org.thymeleaf.extras.springsecurity5.dialect.SpringSecurityDialect;
 
@@ -30,6 +31,11 @@ public class SpringitApplication {
 	@Bean
 	PrettyTime prettyTime() {
 		return new PrettyTime();
+	}
+
+	@Bean
+	BCryptPasswordEncoder passwordEncoder() {
+		return  new BCryptPasswordEncoder();
 	}
 
 }

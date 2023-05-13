@@ -13,9 +13,11 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
+@Entity
 @RequiredArgsConstructor
+@Getter @Setter
 @NoArgsConstructor
-@Entity @Getter @Setter
+
 public class Link extends Auditable {
     @Id
     @GeneratedValue
@@ -31,10 +33,12 @@ public class Link extends Auditable {
     private List<Vote> votes = new ArrayList<>();
 
     private int voteCount =0;
+
+    @ManyToOne
+    private UserSpringIt userSpringIt;
     public void addComment(Comment comment) {
         comments.add(comment);
     }
-
     public String getPrettyTime() {
         PrettyTime pt = BeanUtil.getBean(PrettyTime.class);
         return pt.format(convertToDateviaInstant(getCreationDate()));

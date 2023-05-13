@@ -33,8 +33,12 @@ public class LinkController {
     @GetMapping("/")
     public String list(Model model) {
         model.addAttribute("links", linkService.findAll());
-        model.addAttribute("pageTitle", "List of Links");
+        model.addAttribute("pageTitle", "LIST OF LINKS");
         return "link/list";
+    }
+    @GetMapping("/u/{id}")
+    public String getUser(@PathVariable Long id, Model model) {
+        return "Test";
     }
     @GetMapping("link/{id}")
     public String read(@PathVariable Long id, Model model) {

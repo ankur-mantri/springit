@@ -12,7 +12,7 @@ public class RoleService {
     public RoleService(RoleRepository roleRepository) {
         this.roleRepository = roleRepository;
     }
- /*   public Role findByName(String name) {
+    public Role findByName(String name) {
         return roleRepository.findByName(name);
-    }*/
+    }
 }

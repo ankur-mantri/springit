@@ -8,6 +8,7 @@ import com.vega.demo.repository.CommentRepository;
 import com.vega.demo.repository.LinkRepository;
 import com.vega.demo.repository.RoleRepository;
 import com.vega.demo.repository.UserRepository;
+import com.vega.demo.service.BeanUtil;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.context.annotation.Profile;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -22,6 +23,7 @@ public class DatabaseLoader implements CommandLineRunner {
     private CommentRepository commentRepository;
     private RoleRepository roleRepository;
     private UserRepository userRepository;
+    private Map<String,UserSpringIt> users = new HashMap<>();
 
     public DatabaseLoader(LinkRepository linkRepository, CommentRepository commentRepository, UserRepository userRepository,
                           RoleRepository roleRepository) {
@@ -37,11 +39,11 @@ public class DatabaseLoader implements CommandLineRunner {
         addUsersAndRoles();
 
         List<String> randomComments = new ArrayList<>();
-        randomComments.add("This is funny");
-        randomComments.add("This is awesome");
-        randomComments.add("This is random");
-        randomComments.add("Dont visit this ever");
-        randomComments.add("This is super site");
+        randomComments.add("This is funny link. Wish I could write a joke her :) :) :)");
+        randomComments.add("This is awesome. I am jumping like a JACK");
+        randomComments.add("This is random. Writer is going all over.");
+        randomComments.add("Do not visit this ever. Did you already clicked the link??");
+        randomComments.add("This is super site. Go there if you are a Superman or Superwoman or Superwhatever");
 
 
         Map<String,String> links = new HashMap<>();
@@ -58,8 +60,17 @@ public class DatabaseLoader implements CommandLineRunner {
         links.put("File download example using Spring REST Controller","https://www.jeejava.com/file-download-example-using-spring-rest-controller/");
 
         links.forEach((k,v) -> {
+            UserSpringIt u1 = users.get("user@gmail.com");
+            UserSpringIt u2 = users.get("master@gmail.com");
             Link link = new Link(k,v);
+            if(k.startsWith("Build")) {
+                link.setUserSpringIt(u1);
+            } else {
+                link.setUserSpringIt(u2);
+            }
+
             linkRepository.save(link);
+
             int n = (int) (Math.random()*randomComments.size());
             for (int i = 0; i < n; i++) {
                Comment comment = new Comment(randomComments.get(i), link);
@@ -76,7 +87,8 @@ public class DatabaseLoader implements CommandLineRunner {
     }
 
     private void addUsersAndRoles() {
-        BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
+//        BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
+        BCryptPasswordEncoder encoder = BeanUtil.getBean(BCryptPasswordEncoder.class);
         String secret = "{bcrypt}" + encoder.encode("password");
 
         Role userRole = new Role("ROLE_USER");
@@ -84,18 +96,23 @@ public class DatabaseLoader implements CommandLineRunner {
         Role adminRole = new Role("ROLE_ADMIN");
         roleRepository.save(adminRole);
 
-        UserSpringIt userSpringIt = new UserSpringIt("user@gmail.com",secret,true);
+        UserSpringIt userSpringIt = new UserSpringIt("user@gmail.com",secret,true,"Smith","Jones","SJoe");
         userSpringIt.addRole(userRole);
+        userSpringIt.setConfirmPassword(secret);
         userRepository.save(userSpringIt);
+        users.put("user@gmail.com",userSpringIt);
 
-        UserSpringIt admin = new UserSpringIt("admin@gmail.com",secret,true);
+        UserSpringIt admin = new UserSpringIt("admin@gmail.com",secret,true,"Randhawa","Guruji","DBoss");
         admin.addRole(adminRole);
+        admin.setConfirmPassword(secret);
         userRepository.save(admin);
+        users.put("admin@gmail.com",admin);
 
-        UserSpringIt master = new UserSpringIt("master@gmail.com",secret,true);
+        UserSpringIt master = new UserSpringIt("master@gmail.com",secret,true,"Mickey","Mouse","wife");
         master.addRoles(new HashSet<>(Arrays.asList(userRole,adminRole)));
+        master.setConfirmPassword(secret);
         userRepository.save(master);
-
+        users.put("master@gmail.com",master);
     }
 
 
